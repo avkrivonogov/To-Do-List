@@ -1,0 +1,17 @@
+stages:
+  - build
+  - check
+
+Сборка:
+  stage: build
+  script:
+    - gradle assemble
+
+Проверка стиля кодирования:
+  stage: check
+  script:
+    - gradle checkstyle
+  artifacts:
+    when: always
+    paths:
+      - build/reports/checkstyle/*.html
