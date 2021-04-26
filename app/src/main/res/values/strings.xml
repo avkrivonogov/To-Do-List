@@ -1,3 +1,11 @@
 <resources>
-    <string name="app_name">Заметки</string>
+    <string name="app_name">MyNotes</string>
+    <string name="title">Title</string>
+    <string name="sort">Sort</string>
+    <string name="delete">Delete</string>
+    <string name="alarm">Alarm</string>
+    <string name="edit_task">Edit</string>
+    <string name="edit">Edit</string>
+    <string name="planned">Planned</string>
+    <string name="tasks">Tasks</string>
 </resources>
