@@ -29,7 +29,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/tasks_title"/>
+            app:layout_constraintTop_toBottomOf="@+id/tasks_title" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -39,7 +39,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:src="@drawable/ic_add_new"
-        app:backgroundTint="#52AAAAAA" />
+        android:src="@drawable/ic_add_new" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

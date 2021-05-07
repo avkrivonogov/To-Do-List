@@ -8,4 +8,12 @@
     <string name="edit">Edit</string>
     <string name="planned">Planned</string>
     <string name="tasks">Tasks</string>
+    <string name="new_task_list">New Task List</string>
+    <string name="new_task">New Task</string>
+    <string name="enter_new_name">Enter New Name</string>
+    <string name="rename">Rename</string>
+    <string name="cancel">Cancel</string>
+    <string name="add_new_list">Add New List</string>
+    <string name="create_new_list">Create new List</string>
+    <string name="create">Create</string>
 </resources>

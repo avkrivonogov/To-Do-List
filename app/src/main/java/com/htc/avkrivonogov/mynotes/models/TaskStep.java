@@ -3,36 +3,43 @@ package com.htc.avkrivonogov.mynotes.models;
 public class TaskStep {
 
     private int id;
-    private String step;
-    private boolean done;
+    private int taskId;
+    private String content;
+    private int complete;
 
-    public TaskStep(int id, String step, boolean done) {
+    public TaskStep(int id, int taskId, String content, int complete) {
         this.id = id;
-        this.step = step;
-        this.done = done;
+        this.taskId = taskId;
+        this.content = content;
+        this.complete = complete;
     }
 
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public int getTaskId() {
+        return taskId;
     }
 
-    public String getStep() {
-        return step;
+    //тут еще подумать почему надо сэттер
+    public void setTaskId(int taskId) {
+        this.taskId = taskId;
     }
 
-    public void setStep(String step) {
-        this.step = step;
+    public String getContent() {
+        return content;
     }
 
-    public boolean isDone() {
-        return done;
+    public void setContent(String content) {
+        this.content = content;
     }
 
-    public void setDone(boolean done) {
-        this.done = done;
+    public int getComplete() {
+        return complete;
+    }
+
+    public void setComplete(int complete) {
+        this.complete = complete;
     }
 }

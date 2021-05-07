@@ -1,81 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
 
-    <include
-        android:id="@+id/toolbar"
-        layout="@layout/toolbar" />
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginLeft="10dp"
+        android:paddingRight="10dp" />
 
     <LinearLayout
-        app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        android:id="@+id/detail_root"
-        android:layout_width="match_parent"
+        android:layout_width="200dp"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_marginLeft="0dp"
-        android:layout_marginRight="0dp">
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textViewTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
         <LinearLayout
-            android:id="@+id/detail_wrapper"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:paddingTop="8dp">
+            android:layout_width="200dp"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
-            <LinearLayout
-                android:id="@+id/detail_title_card"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/textViewStages"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/textViewDate"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="6dp"
-                android:orientation="vertical"
-                android:paddingBottom="2dp">
-
-                <LinearLayout
-                    android:id="@+id/title_wrapper"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <EditText
-                        android:id="@+id/detail_title"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/title"
-                        android:inputType="textCapSentences"
-                        android:paddingStart="6dp"
-                        android:paddingTop="6dp"
-                        android:paddingEnd="16dp"
-                        android:paddingBottom="6dp" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <androidx.coordinatorlayout.widget.CoordinatorLayout
-                android:id="@+id/detail_content_card"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingBottom="2dp" >
-                <ScrollView
-                    android:id="@+id/content_wrapper"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scrollbarSize="4dp"
-                    android:scrollbarStyle="outsideOverlay">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical" >
-                        <include
-                            android:id="@+id/fragment_detail_content"
-                            layout="@layout/task_step" />
-                    </LinearLayout>
-                </ScrollView>
-            </androidx.coordinatorlayout.widget.CoordinatorLayout>
+                android:paddingLeft="10dp" />
         </LinearLayout>
     </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+    <CheckBox
+        android:id="@+id/checkBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</LinearLayout>
