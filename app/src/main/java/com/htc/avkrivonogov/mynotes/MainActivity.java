@@ -5,7 +5,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -19,14 +18,12 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.htc.avkrivonogov.mynotes.controllers.adapters.TasksListAdapter;
-import com.htc.avkrivonogov.mynotes.controllers.dialogs.CreateNewTasksList;
 import com.htc.avkrivonogov.mynotes.data.DatabaseHelper;
-import com.htc.avkrivonogov.mynotes.data.TasksList;
+import com.htc.avkrivonogov.mynotes.data.TasksListMethods;
 import com.htc.avkrivonogov.mynotes.models.TaskList;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity{
@@ -53,10 +50,9 @@ public class MainActivity extends AppCompatActivity{
         databaseHelper = new DatabaseHelper(getApplicationContext());
         db = databaseHelper.getReadableDatabase();
 
-//        Collections.sort(tasksList);
-
         listClickListener = (taskList, position) -> {
             Intent intent = new Intent(getApplicationContext(), TasksListActivity.class);
+            Collections.sort(tasksList, (o1, o2) -> o1.toString().compareTo(o2.toString()));
             intent.putExtra("id", taskList.getId());
             intent.putExtra("title", taskList.getTitle());
             startActivity(intent);
@@ -64,7 +60,7 @@ public class MainActivity extends AppCompatActivity{
         recyclerView = findViewById(R.id.rv_main);
         adapter = new TasksListAdapter(this, listClickListener, tasksList);
         recyclerView.setAdapter(adapter);
-        cursor = TasksList.getCursorTaskList(db);
+        cursor = TasksListMethods.getCursorTaskList(db);
         while (cursor.moveToNext()) {
             int id = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.KEY_TASK_LIST_ID));
             String title = cursor.getString(cursor.getColumnIndex(DatabaseHelper.KEY_TASK_LIST_NAME));
@@ -95,8 +91,8 @@ public class MainActivity extends AppCompatActivity{
             case R.id.menu_sort:
                 finish();
             case R.id.menu_add_new_list:
-                CreateNewTasksList createDialog = new CreateNewTasksList();
-                createDialog.show(getSupportFragmentManager(), "createNeList");
+//                CreateNewTasksList createDialog = new CreateNewTasksList();
+//                createDialog.show(getSupportFragmentManager(), "createNeList");
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 final EditText newList = new EditText(this);
                 builder.setTitle(R.string.create_new_list)
@@ -110,8 +106,8 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public void action(String title) {
-        TasksList.createTaskList(db, title);
-        cursor = TasksList.getCursorTaskList(db);
+        TasksListMethods.createTaskList(db, title);
+        cursor = TasksListMethods.getCursorTaskList(db);
         tasksList.clear();
         while (cursor.moveToNext()) {
             int id = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.KEY_TASK_LIST_ID));
@@ -132,7 +128,7 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public void goToTasks(View view) {
-        Intent intent = new Intent(this, Tasks.class);
+        Intent intent = new Intent(this, TasksActivity.class);
         startActivity(intent);
     }
 

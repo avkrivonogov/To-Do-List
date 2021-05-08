@@ -1,17 +1,23 @@
 package com.htc.avkrivonogov.mynotes;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Spinner;
 
 import androidx.appcompat.widget.Toolbar;
 
+import com.htc.avkrivonogov.mynotes.data.DatabaseHelper;
 import com.htc.avkrivonogov.mynotes.models.Task;
 import com.htc.avkrivonogov.mynotes.models.TaskStep;
 
@@ -20,7 +26,14 @@ import java.util.List;
 public class EditTaskActivity extends AppCompatActivity {
 
     public static final String EXTRA_TASK = "Put";
-    EditText taskTitle;
+
+    DatabaseHelper databaseHelper;
+    SQLiteDatabase db;
+    Cursor cursor;
+
+    EditText title;
+    EditText description;
+    Spinner listSpinner;
     ImageButton reminderButton;
 
     List<TaskStep> taskStepList;
@@ -31,10 +44,17 @@ public class EditTaskActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_task);
-//        toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        databaseHelper = new DatabaseHelper(getApplicationContext());
+        db = databaseHelper.getReadableDatabase();
+
+        title = findViewById(R.id.task_list_title);
+        description = findViewById(R.id.)
+
+        toolbar = (Toolbar) findViewById(R.id.edit_toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         reminderButton = (ImageButton) findViewById(R.id.reminder_button);
         reminderButton.setOnClickListener(new View.OnClickListener() {
@@ -63,20 +83,15 @@ public class EditTaskActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_edit_task, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
-
-
-//    @Override
-//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-//        switch (item.getItemId()) {
-//            case android.R.id.home:
-//                finish();
-//                break;
-//            case R.id.menu_done:
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }

@@ -14,9 +14,9 @@
         android:theme="@style/Theme.MyNotes">
         <activity android:name=".TasksListActivity"/>
         <activity android:name=".PlannedActivity" />
-        <activity android:name=".Tasks" />
+        <activity android:name=".TasksActivity" />
         <activity android:name=".EditTaskActivity" />
-        <activity android:name=".SingleTask" />
+        <activity android:name=".SingleTaskActivity" />
         <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

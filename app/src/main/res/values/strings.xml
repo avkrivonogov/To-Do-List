@@ -16,4 +16,6 @@
     <string name="add_new_list">Add New List</string>
     <string name="create_new_list">Create new List</string>
     <string name="create">Create</string>
+    <string name="rename_list">Rename List</string>
+    <string name="save">Save</string>
 </resources>

@@ -2,6 +2,7 @@ package com.htc.avkrivonogov.mynotes.models;
 
 import android.graphics.Bitmap;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Task {
@@ -10,10 +11,24 @@ public class Task {
     private String description;
     private Bitmap image;
     private LocalDateTime creation;
-    private LocalDateTime completeDate;
+    private LocalDate completeDate;
     private LocalDateTime reminder;
     private int taskListId;
-    private int complete;
+    private int completeStatus;
+
+    public Task(int id, String title, String description, Bitmap image, LocalDateTime creation,
+                LocalDate completeDate, LocalDateTime reminder,
+                int taskListId, int completeStatus) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.image = image;
+        this.creation = creation;
+        this.completeDate = completeDate;
+        this.reminder = reminder;
+        this.taskListId = taskListId;
+        this.completeStatus = completeStatus;
+    }
 
     public int getId() {
         return id;
@@ -51,11 +66,11 @@ public class Task {
         this.creation = creation;
     }
 
-    public LocalDateTime getCompleteDate() {
+    public LocalDate getCompleteDate() {
         return completeDate;
     }
 
-    public void setCompleteDate(LocalDateTime completeDate) {
+    public void setCompleteDate(LocalDate completeDate) {
         this.completeDate = completeDate;
     }
 
@@ -75,11 +90,11 @@ public class Task {
         this.taskListId = taskListId;
     }
 
-    public int getComplete() {
-        return complete;
+    public int getCompleteStatus() {
+        return completeStatus;
     }
 
-    public void setComplete(int complete) {
-        this.complete = complete;
+    public void setCompleteStatus(int completeStatus) {
+        this.completeStatus = completeStatus;
     }
 }

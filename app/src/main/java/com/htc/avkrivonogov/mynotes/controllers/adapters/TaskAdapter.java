@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.htc.avkrivonogov.mynotes.R;
 import com.htc.avkrivonogov.mynotes.data.DatabaseHelper;
-import com.htc.avkrivonogov.mynotes.data.Tasks;
 import com.htc.avkrivonogov.mynotes.models.Task;
 
 import java.util.List;
@@ -47,13 +45,13 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         holder.title.setText(task.getTitle());
         holder.completeTask.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if(isChecked) {
-                task.setComplete(1);
+                task.setCompleteStatus(1);
             } else {
-                task.setComplete(0);
+                task.setCompleteStatus(0);
             }
         });
         holder.itemView.setOnClickListener(v -> onTaskClickListener.onTaskClick(task, position));
-        if (task.getComplete() == 1) {
+        if (task.getCompleteStatus() == 1) {
             holder.completeTask.setChecked(true);
             holder.title.setPaintFlags(holder.title.getPaintFlags() |
                     Paint.STRIKE_THRU_TEXT_FLAG);
