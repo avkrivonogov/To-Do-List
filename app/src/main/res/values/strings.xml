@@ -18,4 +18,14 @@
     <string name="create">Create</string>
     <string name="rename_list">Rename List</string>
     <string name="save">Save</string>
+    <string name="of">Of</string>
+    <string name="add_image">Add Image</string>
+    <string name="comment">Comment</string>
+    <string name="reminder">Reminder</string>
+    <string name="complete_date">Complete Date</string>
+    <string name="creation_date">Creation Date</string>
+    <string name="reminder_time_error">Incorrect Time Reminder</string>
+    <string name="reminder_date_error">Incorrect Date Reminder</string>
+    <string name="end_date_error">Incorrect Date Complete</string>
+    <string name="task_title_empty">Empty Title!</string>
 </resources>

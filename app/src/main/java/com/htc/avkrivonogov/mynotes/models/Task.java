@@ -16,18 +16,11 @@ public class Task {
     private int taskListId;
     private int completeStatus;
 
-    public Task(int id, String title, String description, Bitmap image, LocalDateTime creation,
-                LocalDate completeDate, LocalDateTime reminder,
-                int taskListId, int completeStatus) {
+    public Task(int id, String title, int completeStatus) {
         this.id = id;
         this.title = title;
-        this.description = description;
-        this.image = image;
-        this.creation = creation;
-        this.completeDate = completeDate;
-        this.reminder = reminder;
-        this.taskListId = taskListId;
         this.completeStatus = completeStatus;
+
     }
 
     public int getId() {

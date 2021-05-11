@@ -14,12 +14,14 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.htc.avkrivonogov.mynotes.controllers.TaskComparator;
 import com.htc.avkrivonogov.mynotes.controllers.adapters.TaskAdapter;
 import com.htc.avkrivonogov.mynotes.data.DatabaseHelper;
 import com.htc.avkrivonogov.mynotes.data.TaskMethods;
 import com.htc.avkrivonogov.mynotes.models.Task;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class PlannedActivity extends AppCompatActivity {
@@ -28,11 +30,12 @@ public class PlannedActivity extends AppCompatActivity {
     SQLiteDatabase db;
     Cursor cursor;
 
-    List<Task> taskList = new ArrayList<>();
+    List<Task> tasksList = new ArrayList<>();
 
     RecyclerView recyclerView;
     TaskAdapter taskAdapter;
     TaskAdapter.OnTaskClickListener taskClickListener;
+    TaskComparator comparator;
 
     Toolbar toolbar;
 
@@ -51,7 +54,14 @@ public class PlannedActivity extends AppCompatActivity {
             startActivity(intent);
         };
 
-        cursor = TaskMethods.getCursorFromPlannedTask(db);
+        cursor = TaskMethods.getCursorFromTaskList(db, 0);
+        while (cursor.moveToNext()) {
+            Task task = TaskMethods.getTaskFromCursor(cursor);
+            tasksList.add(task);
+        }
+//        comparator.sortTaskByCreation(tasksList);
+//        taskAdapter = new TaskAdapter(this, taskClickListener, tasksList);
+//        recyclerView.setAdapter(taskAdapter);
 
         toolbar = (androidx.appcompat.widget.Toolbar) findViewById(R.id.planned_toolbar);
         setSupportActionBar(toolbar);
@@ -72,8 +82,10 @@ public class PlannedActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish();
-            //использовать switch
-//        } else if (item.getItemId() == R.id.menu_sort) {
+        } else if (item.getItemId() == R.id.menu_sort) {
+            Collections.reverse(tasksList);
+            taskAdapter = new TaskAdapter(this, taskClickListener, tasksList);
+            recyclerView.setAdapter(taskAdapter);
         }
         return super.onOptionsItemSelected(item);
     }

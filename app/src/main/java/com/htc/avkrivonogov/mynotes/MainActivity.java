@@ -50,23 +50,25 @@ public class MainActivity extends AppCompatActivity{
         databaseHelper = new DatabaseHelper(getApplicationContext());
         db = databaseHelper.getReadableDatabase();
 
+        recyclerView = findViewById(R.id.rv_main);
         listClickListener = (taskList, position) -> {
             Intent intent = new Intent(getApplicationContext(), TasksListActivity.class);
-            Collections.sort(tasksList, (o1, o2) -> o1.toString().compareTo(o2.toString()));
+            tasksList.sort((o1, o2) -> o1.toString().compareTo(o2.toString()));
             intent.putExtra("id", taskList.getId());
             intent.putExtra("title", taskList.getTitle());
             startActivity(intent);
         };
-        recyclerView = findViewById(R.id.rv_main);
-        adapter = new TasksListAdapter(this, listClickListener, tasksList);
-        recyclerView.setAdapter(adapter);
         cursor = TasksListMethods.getCursorTaskList(db);
+        tasksList.clear();
         while (cursor.moveToNext()) {
             int id = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.KEY_TASK_LIST_ID));
             String title = cursor.getString(cursor.getColumnIndex(DatabaseHelper.KEY_TASK_LIST_NAME));
             TaskList taskList = new TaskList(id, title);
             tasksList.add(taskList);
         }
+        tasksList.sort((o1, o2) -> o1.getTitle().compareTo(o2.getTitle()));
+        adapter = new TasksListAdapter(this, listClickListener, tasksList);
+        recyclerView.setAdapter(adapter);
 
         toolbar = (androidx.appcompat.widget.Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
@@ -87,20 +89,20 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_sort:
-                finish();
-            case R.id.menu_add_new_list:
-//                CreateNewTasksList createDialog = new CreateNewTasksList();
-//                createDialog.show(getSupportFragmentManager(), "createNeList");
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                final EditText newList = new EditText(this);
-                builder.setTitle(R.string.create_new_list)
-                        .setView(newList)
-                        .setPositiveButton(R.string.create, (dialog, which) ->
-                                action(newList.getText().toString()));
-                builder.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.cancel());
-                builder.show();
+        if (item.getItemId() == R.id.menu_sort) {
+            Collections.reverse(tasksList);
+            adapter = new TasksListAdapter(this, listClickListener, tasksList);
+            recyclerView.setAdapter(adapter);
+        } else if (item.getItemId() == R.id.menu_add_new_list) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            final EditText newList = new EditText(this);
+            builder.setTitle(R.string.create_new_list)
+                    .setView(newList)
+                    .setPositiveButton(R.string.create, (dialog, which) ->
+                            action(newList.getText().toString()));
+            builder.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.cancel());
+            builder.show();
+
         }
         return super.onOptionsItemSelected(item);
     }
@@ -115,7 +117,7 @@ public class MainActivity extends AppCompatActivity{
             TaskList taskList = new TaskList(id, title);
             tasksList.add(taskList);
         }
-        Collections.sort(tasksList, (o1, o2) -> o1.toString().compareTo(o2.toString()));
+        tasksList.sort((o1, o2) -> o1.getTitle().compareTo(o2.getTitle()));
         adapter = new TasksListAdapter(this, listClickListener, tasksList);
         recyclerView.setAdapter(adapter);
     }

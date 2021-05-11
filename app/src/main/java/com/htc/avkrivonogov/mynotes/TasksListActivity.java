@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Menu;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.htc.avkrivonogov.mynotes.controllers.adapters.TaskAdapter;
 import com.htc.avkrivonogov.mynotes.data.DatabaseHelper;
+import com.htc.avkrivonogov.mynotes.data.TaskMethods;
 import com.htc.avkrivonogov.mynotes.data.TasksListMethods;
 import com.htc.avkrivonogov.mynotes.models.Task;
 
@@ -28,6 +30,7 @@ public class TasksListActivity extends AppCompatActivity {
 
     DatabaseHelper databaseHelper;
     SQLiteDatabase db;
+    Cursor cursor;
 
     RecyclerView recyclerView;
     List<Task> taskList = new ArrayList<>();
@@ -65,6 +68,16 @@ public class TasksListActivity extends AppCompatActivity {
         listTitle = findViewById(R.id.tasks_list_title);
         listTitle.setText(bundle.getString("title"));
 
+        cursor = TaskMethods.getCursorFromTaskList(db, tasksListId);
+        while (cursor.moveToNext()) {
+            Task task = TaskMethods.getTaskFromCursor(cursor);
+            taskList.add(task);
+        }
+        taskList.sort(((o1, o2) -> o1.getCreation().compareTo(o2.getCreation())));
+        taskAdapter = new TaskAdapter(this, taskClickListener, taskList);
+        recyclerView.setAdapter(taskAdapter);
+
+
         fab = (FloatingActionButton) findViewById(R.id.tasks_list_fab_add);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,8 +112,6 @@ public class TasksListActivity extends AppCompatActivity {
         }
         return true;
     }
-//            case R.id.menu_sort_list:
-//                finish();
     public void action(String title) {
         TasksListMethods.rename(db, tasksListId, title);
         listTitle.setText(title);
@@ -110,5 +121,6 @@ public class TasksListActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         db.close();
+        cursor.close();
     }
 }

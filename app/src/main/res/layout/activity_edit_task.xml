@@ -1,36 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/edit_toolbar"
-            android:layout_height="?android:actionBarSize"
             android:layout_width="match_parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:elevation="4dp"
+            android:layout_height="?android:actionBarSize"
             android:background="?attr/colorPrimary"
+            android:elevation="4dp"
             app:navigationIcon="@drawable/ic_cancel"
-            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
 
         <LinearLayout
             android:id="@+id/title"
-            app:layout_constraintTop_toBottomOf="@+id/edit_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <TextView
+                android:id="@+id/task_title_hint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/title"
+                android:textSize="18sp" />
 
             <EditText
-                android:id="@+id/task_list_title"
+                android:id="@+id/edit_task_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/title"
@@ -42,16 +45,14 @@
         </LinearLayout>
 
         <Spinner
-            android:id="@+id/tasks_list_choose"
+            android:id="@+id/edit_tasks_list_choose"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/title"/>
+            android:layout_height="wrap_content" />
 
         <ScrollView
             android:id="@+id/edit_task_scrl"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/tasks_list_choose">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:id="@+id/te_linear_layout"
@@ -70,9 +71,11 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:onClick="addStage"
                         android:src="@drawable/ic_add_new" />
+
                     <EditText
-                        android:id="@+id/step_text"
+                        android:id="@+id/edit_step_text"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="8" />
@@ -80,58 +83,117 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/creation_date"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="12"
-                        android:freezesText="true"
-                        android:gravity="center_vertical"
+                        android:layout_height="wrap_content"
+                        android:text="@string/creation_date" />
+
+                    <EditText
+                        android:id="@+id/edit_creation_date"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:textColor="@color/black" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/complete_date"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="12"
-                        android:freezesText="true"
-                        android:gravity="center_vertical"
+                        android:layout_height="wrap_content"
+                        android:text="@string/complete_date" />
+
+                    <EditText
+                        android:id="@+id/edit_complete_date"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:textColor="@color/black" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/reminder_task"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/reminder" />
+
+                    <EditText
+                        android:id="@+id/edit_reminder_date_task"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_weight="12"
-                        android:freezesText="true"
-                        android:gravity="center_vertical"
                         android:textColor="@color/black" />
 
-                    <ImageButton
-                        android:id="@+id/reminder_button"
+                    <EditText
+                        android:id="@+id/edit_reminder_time_task"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <LinearLayout
+                        android:id="@+id/notificationLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal">
+
+                        <ImageButton
+                            android:id="@+id/timeNotification"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_alarm_date"
+                            android:onClick="setTime"/>
+
+                        <ImageButton
+                            android:id="@+id/dateNotification"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_alarm_date"
+                            android:onClick="setDate"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="3"
+                        android:text="@string/add_image" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="9"
+                        android:text="@string/comment" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/task_image"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:onClick="addImage"
+                        android:src="@drawable/ic_add_new" />
+
+                    <EditText
+                        android:id="@+id/edit_description"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:src="@drawable/ic_alarm_date"/>
+                        android:inputType="textCapSentences"/>
                 </LinearLayout>
 
-                <ImageView
-                    android:id="@+id/task_image"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp" />
             </LinearLayout>
         </ScrollView>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </LinearLayout>
+</ScrollView>

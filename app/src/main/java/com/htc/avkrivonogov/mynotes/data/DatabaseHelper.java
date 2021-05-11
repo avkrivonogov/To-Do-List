@@ -41,8 +41,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + KEY_TASK_COMPLETE_DATE + " TEXT, "
             + KEY_TASK_REMINDER + " TEXT, "
             + KEY_TASK_STATUS + " INTEGER DEFAULT(0),"
-            + CATEGORY_ID  + " INTEGER REFERENCES " + TABLE_TASK_LIST
-            + " (" + KEY_TASK_LIST_ID + ") NOT NULL)";
+            + CATEGORY_ID  + " INTEGER NOT NULL, "
+            + " FOREIGN KEY(" + CATEGORY_ID + ") REFERENCES categories(category_id));";
+//            + " (" + KEY_TASK_LIST_ID + ") NOT NULL)";
 
     //Table Steps
     public static final String TABLE_STEPS = "steps";
@@ -58,7 +59,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + TASK_ID + " INTEGER REFERENCES " + TABLE_TASKS + " (" + KEY_TASK_ID + ") NOT NULL)";
 
 
-    private SQLiteDatabase db;
+    private static SQLiteDatabase db;
 
     public DatabaseHelper(@Nullable Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -73,5 +74,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    }
+
+    static SQLiteDatabase getDatabase(Context context) {
+        if (db != null) {
+            return db;
+        }
+
+        DatabaseHelper databaseHelper = new DatabaseHelper(context);
+        db = databaseHelper.getWritableDatabase();
+        return db;
     }
 }

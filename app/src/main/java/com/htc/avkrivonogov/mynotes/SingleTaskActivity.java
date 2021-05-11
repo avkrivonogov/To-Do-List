@@ -35,7 +35,7 @@ public class SingleTaskActivity extends AppCompatActivity {
 
     int taskId;
     String title;
-    String content;
+    String description;
     String notificationDate;
     String notificationTime;
 
@@ -72,6 +72,10 @@ public class SingleTaskActivity extends AppCompatActivity {
         completeDate = findViewById(R.id.complete_date);
         reminderDate = findViewById(R.id.reminder_task);
         image = findViewById(R.id.task_image);
+
+        titleView.setText(title);
+        descriptionView.setText(description);
+        creationDate.setText((CharSequence) creationDate);
     }
 
     @Override

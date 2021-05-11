@@ -1,6 +1,8 @@
 package com.htc.avkrivonogov.mynotes.controllers.adapters;
 
+import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,8 +16,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.htc.avkrivonogov.mynotes.R;
 import com.htc.avkrivonogov.mynotes.data.DatabaseHelper;
+import com.htc.avkrivonogov.mynotes.data.TaskStepsMethods;
 import com.htc.avkrivonogov.mynotes.models.Task;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
@@ -27,9 +33,22 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
     private TaskAdapter.OnTaskClickListener onTaskClickListener;
     private List<Task> tasks;
     private LayoutInflater inflater;
+    private boolean isSortByAsc;
 
     DatabaseHelper databaseHelper;
     SQLiteDatabase db;
+
+    Context context;
+
+
+
+    public TaskAdapter(Context context, TaskAdapter.OnTaskClickListener onTaskClick,
+                       List<Task> list) {
+        this.context = context;
+        this.onTaskClickListener = onTaskClick;
+        this.inflater = LayoutInflater.from(context);
+        this.tasks = list;
+    }
 
     @NonNull
     @Override
@@ -42,7 +61,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Task task = tasks.get(position);
+
         holder.title.setText(task.getTitle());
+
         holder.completeTask.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if(isChecked) {
                 task.setCompleteStatus(1);
@@ -50,6 +71,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
                 task.setCompleteStatus(0);
             }
         });
+
         holder.itemView.setOnClickListener(v -> onTaskClickListener.onTaskClick(task, position));
         if (task.getCompleteStatus() == 1) {
             holder.completeTask.setChecked(true);
@@ -59,7 +81,21 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             holder.title.setPaintFlags(holder.title.getPaintFlags() &
                     (~ Paint.STRIKE_THRU_TEXT_FLAG));
         }
-        holder.title.setText(task.getTitle());
+
+        int allSteps = TaskStepsMethods.getAllSteps(db, task.getId());
+        if (allSteps != 0) {
+            holder.countSteps.setText(TaskStepsMethods.getCompleteStepsTask(db, task.getId())
+            + R.string.of + allSteps);
+        }
+
+        LocalDate completeDate = task.getCompleteDate();
+        holder.dateComplete.setText(completeDate != null
+                ? completeDate.format(DateTimeFormatter.ofPattern("dd MM yyyy"))
+                : null);
+
+        Bitmap image = task.getImage();
+        holder.image.setImageBitmap(image);
+        holder.image.setVisibility(image != null ? View.VISIBLE : View.GONE);
     }
 
 
@@ -67,6 +103,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
     public int getItemCount() {
         return tasks.size();
     }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
         CheckBox completeTask;
         TextView title;
@@ -82,5 +119,27 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             dateComplete = itemView.findViewById(R.id.date_complete);
             image = itemView.findViewById(R.id.image_task_in_list);
         }
+    }
+
+    public void sortTaskByCreation() {
+        if (isSortByAsc) {
+            tasks.sort(((o1, o2) -> o2.getCreation().compareTo(o1.getCreation())));
+            isSortByAsc = false;
+        } else {
+            tasks.sort(((o1, o2) -> o1.getCreation().compareTo(o2.getCreation())));
+            isSortByAsc = true;
+        }
+        notifyDataSetChanged();
+    }
+
+    public void sortTaskByComplete() {
+        if (isSortByAsc) {
+            tasks.sort(((o1, o2) -> o2.getCompleteDate().compareTo(o1.getCompleteDate())));
+            isSortByAsc = false;
+        } else {
+            tasks.sort(((o1, o2) -> o1.getCompleteDate().compareTo(o2.getCompleteDate())));
+            isSortByAsc = true;
+        }
+        notifyDataSetChanged();
     }
 }
