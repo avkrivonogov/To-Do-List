@@ -155,7 +155,6 @@ public class EditTaskActivity extends AppCompatActivity {
         }
     }
 
-
     private void initializeTaskFields() {
         EditText et = findViewById(R.id.edit_task_title);
         et.setText(task.getTitle());
@@ -180,7 +179,6 @@ public class EditTaskActivity extends AppCompatActivity {
                 ? reminderDateTime.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
                 : null);
 
-//
         Bitmap image = task.getImage();
         ImageView iv = findViewById(R.id.task_image);
         iv.setImageBitmap(image);
