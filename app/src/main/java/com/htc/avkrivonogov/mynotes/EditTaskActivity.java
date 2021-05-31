@@ -1,388 +1,358 @@
 package com.htc.avkrivonogov.mynotes;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.DatePickerDialog;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
+import android.text.format.DateUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
+import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Spinner;
-
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-
+import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.android.material.timepicker.TimeFormat;
 import com.htc.avkrivonogov.mynotes.data.DatabaseHelper;
 import com.htc.avkrivonogov.mynotes.data.TaskMethods;
+import com.htc.avkrivonogov.mynotes.data.TaskStepsMethods;
 import com.htc.avkrivonogov.mynotes.data.TasksListMethods;
 import com.htc.avkrivonogov.mynotes.models.Task;
-import com.htc.avkrivonogov.mynotes.models.TaskList;
-import com.htc.avkrivonogov.mynotes.models.TaskStep;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.DateTimeException;
-import java.time.LocalDate;
+import com.htc.avkrivonogov.mynotes.receiver.AlarmReceiver;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.logging.SimpleFormatter;
 
+/**
+ * Activity редактирования или добавления здаачи.
+ */
 public class EditTaskActivity extends AppCompatActivity {
+  private static final int REFRESH_TASK = 1;
+  DatabaseHelper databaseHelper;
+  SQLiteDatabase db;
+  Cursor cursor;
 
-    public static final String EXTRA_TASK = "Put";
-    private static final int GALLERY_REQUEST = 2;
-    public static final int REFRESH_TASK = 3;
+  int id = 0;
+  int completeStatus;
+  int completeStep;
+  String reminderDate;
+  String reminderTime;
+  String dateComplete;
+  EditText editTitle;
+  EditText editDescription;
+  EditText editStep;
+  TextView creationDateView;
+  TextView reminderDateView;
+  TextView reminderTimeView;
+  Uri selectedImage;
+  Spinner listSpinner;
+  DatePicker setCompleteDate;
+  CheckBox checkCompleteDate;
+  Bundle bundle;
+  List<String> stepList = new ArrayList<>();
+  List<String> listTask = new ArrayList<>();
+  Toolbar toolbar;
 
-    DatabaseHelper databaseHelper;
-    SQLiteDatabase db;
-    Cursor cursor;
+  Calendar calendar = Calendar.getInstance();
 
-    Bundle bundle;
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_edit_task);
 
-//    EditText editTitle;
-//    EditText editDescription;
-    EditText editStep;
-    Spinner listSpinner;
-//    ImageButton reminderButton;
-    ImageView imageView;
-//    CheckBox checkComplete;
-    List<String> stepList = new ArrayList<>();
-    List<String> categoryList = new ArrayList<>();
-    int id;
-    int completeStep;
-    Task task;
+    databaseHelper = new DatabaseHelper(getApplicationContext());
+    db = databaseHelper.getReadableDatabase();
 
-    List<TaskStep> taskStepList;
+    toolbar = findViewById(R.id.edit_toolbar);
+    setSupportActionBar(toolbar);
+    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-    Toolbar toolbar;
+    editTitle = findViewById(R.id.edit_task_title);
+    editDescription = findViewById(R.id.edit_description);
+    editStep = findViewById(R.id.edit_step);
+    creationDateView = findViewById(R.id.edit_creation_date);
+    checkCompleteDate = findViewById(R.id.edit_check_complete_date);
+    setCompleteDate = findViewById(R.id.edit_set_complete_date);
+    reminderDateView = findViewById(R.id.edit_reminder_date_task);
+    reminderTimeView = findViewById(R.id.edit_reminder_time_task);
+    listSpinner = findViewById(R.id.edit_tasks_list_choose);
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_task);
-
-        databaseHelper = new DatabaseHelper(getApplicationContext());
-        db = databaseHelper.getReadableDatabase();
-
-//        editTitle = findViewById(R.id.edit_task_title);
-//        editDescription = findViewById(R.id.edit_description);
-//        editStep = findViewById(R.id.edit_step_text);
-        initializeTask();
-        listSpinner = findViewById(R.id.edit_tasks_list_choose);
-
-        cursor = TasksListMethods.getCursorTaskListTitle(db);
-        categoryList.add("---");
-        while (cursor.moveToNext()) {
-            categoryList.add(cursor.getString(
+    cursor = TasksListMethods.getCursorTaskListTitle(db);
+    String info = getString(R.string.task_title_empty);
+    listTask.add(info);
+    while (cursor.moveToNext()) {
+      listTask.add(cursor.getString(
                     cursor.getColumnIndex(DatabaseHelper.KEY_TASK_LIST_NAME)));
-        }
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                this, android.R.layout.simple_spinner_item, categoryList);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        listSpinner.setAdapter(adapter);
-
-        bundle = getIntent().getExtras();
-        if (bundle != null) {
-            id = bundle.getInt("id");
-            if (bundle.getInt("listId") != 0) {
-                listSpinner.setSelection(bundle.getInt("listId"));
-            }
-        }
-
-        initializeTaskFields();
-        if (id != 0) {
-            String title = cursor.getString(cursor.getColumnIndex(DatabaseHelper.KEY_TASK_NAME));
-            String description = cursor.getString(
-                    cursor.getColumnIndex(DatabaseHelper.KEY_TASK_DESCRIPTION));
-            int listTask = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.CATEGORY_ID));
-
-//            editTitle.setText(title);
-//            editDescription.setText(description);
-
-            listSpinner.setSelection(listTask);
-        }
-
-        toolbar = (Toolbar) findViewById(R.id.edit_toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-//        reminderButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//            }
-//        });
-//
-//        reminderButton.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View v) {
-//                return true;
-//            }
-//        });
     }
+    ArrayAdapter<String> adapter =
+            new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, listTask);
+    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    listSpinner.setAdapter(adapter);
 
-    private void initializeTask() {
-        Intent sentIntent = getIntent();
-        if (sentIntent.hasExtra("taskId")) {
-            cursor = TaskMethods.getCursorFromId(db, id);
-            cursor.moveToFirst();
-            task = TaskMethods.getTaskFromCursor(cursor);
-            return;
-        }
-
-        task = new Task(0, "", 0);
-        task.setCreation(LocalDateTime.now());
-        task.setDescription("");
-        task.setTaskListId(0);
-
-        if (sentIntent.hasExtra("taskListId")) {
-            int taskListId = sentIntent.getIntExtra("taskListId", 0);
-            task.setTaskListId(Math.max(taskListId, 0));
-        }
+    bundle = getIntent().getExtras();
+    if (bundle != null) {
+      id = bundle.getInt("id");
+      if (bundle.getInt("listId") != 0) {
+        listSpinner.setSelection(bundle.getInt("listId"));
+      }
     }
+    if (id != 0) {
+      cursor = TaskMethods.getCursorFromId(db, id);
+      cursor.moveToFirst();
+      String title = cursor.getString(cursor.getColumnIndex(DatabaseHelper.KEY_TASK_NAME));
+      String description =
+              cursor.getString(cursor.getColumnIndex(DatabaseHelper.KEY_TASK_DESCRIPTION));
+      String image = cursor.getString(cursor.getColumnIndex(DatabaseHelper.KEY_TASK_IMAGE));
+      int listTasksId =
+              cursor.getInt(cursor.getColumnIndex(DatabaseHelper.CATEGORY_ID));
+      dateComplete =
+              cursor.getString(cursor.getColumnIndex(DatabaseHelper.KEY_TASK_COMPLETE_DATE));
+      String creationDate =
+              cursor.getString(cursor.getColumnIndex(DatabaseHelper.KEY_TASK_CREATION));
+      String strReminderDate =
+              cursor.getString(cursor.getColumnIndex(DatabaseHelper.KEY_TASK_REMINDER_DATE));
+      String strReminderTime =
+              cursor.getString(cursor.getColumnIndex(DatabaseHelper.KEY_TASK_REMINDER_TIME));
+      completeStatus = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.KEY_TASK_STATUS));
+      completeStep = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.KEY_TASK_COMPLETE_STEPS));
+      if (dateComplete != null) {
+        checkCompleteDate.setChecked(true);
+        setCompleteDate.setVisibility(View.VISIBLE);
+      }
 
-    private void initializeTaskFields() {
-        EditText et = findViewById(R.id.edit_task_title);
-        et.setText(task.getTitle());
-
-        et = findViewById(R.id.edit_description);
-        et.setText(task.getDescription());
-
-        LocalDate endDate = task.getCompleteDate();
-        et = findViewById(R.id.edit_complete_date);
-        et.setText(endDate != null
-                ? endDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
-                : null);
-
-        LocalDateTime reminderDateTime = task.getReminder();
-        et = findViewById(R.id.edit_reminder_date_task);
-        et.setText(reminderDateTime != null
-                ? reminderDateTime.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
-                : null);
-
-        et = findViewById(R.id.edit_reminder_time_task);
-        et.setText(reminderDateTime != null
-                ? reminderDateTime.format(DateTimeFormatter.ofPattern("HH:mm:ss"))
-                : null);
-
-        Bitmap image = task.getImage();
-        ImageView iv = findViewById(R.id.task_image);
-        iv.setImageBitmap(image);
+      editTitle.setText(title);
+      editDescription.setText(description);
+      creationDateView.setText(creationDate);
+      reminderDateView.setText(strReminderDate);
+      reminderTimeView.setText(strReminderTime);
+      listSpinner.setSelection(listTasksId);
+      if (selectedImage != null) {
+        selectedImage = Uri.parse(image);
+      }
     }
+  }
 
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    getMenuInflater().inflate(R.menu.menu_edit_task, menu);
+    return super.onCreateOptionsMenu(menu);
+  }
 
-    public static void start(Activity caller, Task task) {
-        Intent intent = new Intent(caller, EditTaskActivity.class);
-        if (task != null) {
-            intent.putExtra(EXTRA_TASK, String.valueOf(task));
-        }
-        caller.startActivity(intent);
+  @Override
+  public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    if (item.getItemId() == android.R.id.home) {
+      finish();
+    } else if (item.getItemId() == R.id.menu_action_done) {
+      saveChange();
+    } else if (item.getItemId() == R.id.menu_add_image) {
+      Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+      intent.setType("image/*");
+      startActivityForResult(intent, 1);
     }
+    return super.onOptionsItemSelected(item);
+  }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        db.close();
-        cursor.close();
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    db.close();
+    cursor.close();
+  }
+
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+    if ((requestCode == 1) && (resultCode == RESULT_OK)) {
+      selectedImage = data.getData();
     }
+  }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_edit_task, menu);
-        return super.onCreateOptionsMenu(menu);
+  /**
+   * Сохранение данных задачи после создания или изменения.
+   */
+  private void saveChange() {
+    if (editTitle.getText().toString().equals("")) {
+      editTitle.setError(getResources().getString(R.string.task_title_empty));
+    } else {
+      String title = editTitle.getText().toString();
+      String description = null;
+      if (!editDescription.getText().toString().equals("")) {
+        description = editDescription.getText().toString();
+      }
+      String image = null;
+      if (selectedImage != null) {
+        image = selectedImage.toString();
+      }
+      String creationDate = LocalDateTime.now().format(
+              DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
+      if (checkCompleteDate.isChecked()) {
+        int day = setCompleteDate.getDayOfMonth();
+        String strDay = String.valueOf(day);
+        if (day < 10) {
+          strDay = "0".concat(strDay);
+        }
+        int month = setCompleteDate.getMonth() + 1;
+        String strMonth = String.valueOf(month);
+        if (month < 10) {
+          strMonth = "0".concat(strMonth);
+        }
+        dateComplete = strDay + "." + strMonth + "." + setCompleteDate.getYear();
+      }
+
+      int listTask = listSpinner.getSelectedItemPosition();
+      Task task;
+      if (bundle.getString("previouslyActivity") != null
+              && bundle.getString("previouslyActivity").equals("SingleTaskActivity")) {
+        task = new Task(id, title, description, image, creationDate, dateComplete,
+                reminderDate, reminderTime, listTask, completeStatus, completeStep);
+        TaskMethods.updateTask(db, task);
+        TaskStepsMethods.insert(db, task.getId(), stepList);
+      } else {
+        task = new Task(title, description, image, creationDate, dateComplete,
+                reminderDate, reminderTime, listTask, 0, 0);
+        TaskMethods.addTask(db, task);
+        id = TaskMethods.taskLastId(db);
+        TaskStepsMethods.insert(db, id, stepList);
+      }
+
+      Intent intent = new Intent();
+      intent.putExtra("id", id);
+      setResult(REFRESH_TASK, intent);
+      finish();
+
+      if (reminderDate != null && reminderTime != null) {
+        Date date = null;
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss dd.MM.yyyy");
+        String reminder = reminderTime +  ":00" + reminderDate;
+        try {
+          date = dateFormat.parse(reminder);
+        } catch (ParseException e) {
+          e.printStackTrace();
+        }
+
+        Intent reminderIntent = new Intent(getApplicationContext(), AlarmReceiver.class);
+        reminderIntent.putExtra("taskId", id);
+        reminderIntent.putExtra("title", task.getTitle());
+        if (task.getDescription() != null) {
+          reminderIntent.putExtra("description", task.getDescription());
+        }
+        if (task.getImage() != null) {
+          reminderIntent.putExtra("image", task.getImage());
+        }
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, id, reminderIntent,
+                PendingIntent.FLAG_CANCEL_CURRENT);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        alarmManager.set(AlarmManager.RTC, date.getTime(), pendingIntent);
+      }
     }
+  }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            finish();
-        } else if (item.getItemId() == R.id.menu_action_done) {
-            if (!checkBeforeSaving()) {
-                return true;
-            }
-            Intent intent = new Intent();
-            int taskId = task.getId();
-            taskId = TaskMethods.addTask(this, task);
-            intent.putExtra("taskId", taskId);
-            setResult(REFRESH_TASK, intent);
-            finish();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+  /**
+   * Добавление шага задачи.
+   *
+   * @param view нажатия.
+   */
+  public void addStep(View view) {
+    if (!editStep.getText().toString().equals("")) {
+      stepList.add(editStep.getText().toString());
+      editStep.setText("");
     }
+  }
 
-    private boolean checkBeforeSaving() {
-        boolean isDone = true;
-        EditText editText = findViewById(R.id.edit_task_title);
-        task.setTitle(editText.getText().toString());
-        if ("".equals(task.getTitle())) {
-            editText.setError(getResources().getString(R.string.task_title_empty));
-            isDone = false;
-        }
-
-        editText = findViewById(R.id.edit_description);
-        task.setDescription(editText.getText().toString());
-
-        LocalDate endDate = task.getCompleteDate();
-        editText = findViewById(R.id.edit_complete_date);
-        if (endDate != null) {
-            try {
-                task.setCompleteDate(
-                        LocalDate.parse(editText.getText().toString(), DateTimeFormatter.ofPattern("dd MM yyyy")));
-            } catch (DateTimeException exception) {
-                editText.setError(getResources().getString(R.string.end_date_error));
-                isDone = false;
-            }
-        }
-
-        editText = findViewById(R.id.edit_reminder_date_task);
-        boolean isEmptyReminderDate = false;
-        LocalDate reminderDate = null;
-        if (!"".equals(editText.getText().toString())) {
-            try {
-                reminderDate = LocalDate.parse(editText.getText().toString(),
-                        DateTimeFormatter.ofPattern("dd MMMM yyyy"));
-            } catch (DateTimeException exception) {
-                editText.setError(getResources().getString(R.string.reminder_date_error));
-                isDone = false;
-            }
-        } else {
-            isEmptyReminderDate = true;
-        }
-
-        LocalDateTime reminderDateTime = task.getReminder();
-        if (reminderDateTime != null && reminderDate != null) {
-            LocalDateTime newReminderDateTime = LocalDateTime.of(reminderDate.getYear(),
-                    reminderDate.getMonthValue(), reminderDate.getDayOfMonth(),
-                    reminderDateTime.getHour(), reminderDateTime.getMinute(),
-                    reminderDateTime.getSecond());
-            task.setReminder(newReminderDateTime);
-        }
-
-        editText = findViewById(R.id.edit_reminder_time_task);
-        boolean isEmptyReminderTime = false;
-        LocalTime reminderTime = null;
-        if (!"".equals(editText.getText().toString())) {
-            try {
-                reminderTime = LocalTime.parse(editText.getText().toString(),
-                        DateTimeFormatter.ofPattern("HH:mm:ss"));
-            } catch (DateTimeException exception) {
-                editText.setError(getResources().getString(R.string.reminder_time_error));
-                isDone = false;
-            }
-        } else {
-            isEmptyReminderTime = true;
-        }
-
-        reminderDateTime = task.getReminder();
-        if (reminderDateTime != null && reminderTime != null) {
-            LocalDateTime newReminderDateTime = LocalDateTime.of(reminderDateTime.getYear(),
-                    reminderDateTime.getMonthValue(), reminderDateTime.getDayOfMonth(),
-                    reminderTime.getHour(), reminderTime.getMinute(), reminderTime.getSecond());
-
-            task.setReminder(newReminderDateTime);
-        }
-
-        if (isEmptyReminderDate && isEmptyReminderTime) {
-            task.setReminder(null);
-        } else if (isDone && isEmptyReminderDate) {
-            editText = findViewById(R.id.edit_reminder_date_task);
-            editText.setError(getResources().getString(R.string.reminder_date_error));
-            isDone = false;
-        } else if (isDone && isEmptyReminderTime) {
-            editText = findViewById(R.id.edit_reminder_time_task);
-            editText.setError(getResources().getString(R.string.reminder_time_error));
-            isDone = false;
-        }
-
-        return isDone;
+  /**
+   * Добавление даты завершения задачи.
+   *
+   * @param view нажатия.
+   */
+  public void addCompleteDate(View view) {
+    if (checkCompleteDate.isChecked()) {
+      setCompleteDate.setVisibility(View.VISIBLE);
+    } else {
+      setCompleteDate.setVisibility(View.INVISIBLE);
     }
+  }
 
-    public void addStage(View view) {
-        if (!editStep.getText().toString().equals("")) {
-            stepList.add(editStep.getText().toString());
-            editStep.setText("");
-        }
-    }
+  /**
+   * Установка времени напоминания.
+   *
+   * @param view нажатия.
+   */
+  public void reminderTime(View view) {
+    MaterialTimePicker timePicker = new MaterialTimePicker.Builder()
+            .setTimeFormat(TimeFormat.CLOCK_24H)
+            .setTitleText(R.string.select_reminder_time)
+            .build();
+    timePicker.addOnPositiveButtonClickListener(v -> {
+      int hour = timePicker.getHour();
+      int minute = timePicker.getMinute();
+      String strHour = String.valueOf(hour);
+      if (hour < 10) {
+        strHour = "0".concat(strHour);
+      }
+      String strMinute = String.valueOf(minute);
+      if (minute < 10) {
+        strMinute = "0".concat(strMinute);
+      }
+      reminderTime = strHour + ":" + strMinute;
+      reminderTimeView.setText(reminderTime);
+    });
+    timePicker.show(getSupportFragmentManager(), null);
+  }
 
-    public void addImage(View view) {
-        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-        photoPickerIntent.setType("image/*");
-        startActivityForResult(photoPickerIntent, GALLERY_REQUEST);
-    }
+  /**
+   * Установка даты напоминания.
+   *
+   * @param view нажатия.
+   */
+  public void reminderDate(View view) {
+    DatePickerDialog.OnDateSetListener d = (view1, year, month, dayOfMonth) -> {
+      calendar.set(Calendar.YEAR, year);
+      calendar.set(Calendar.MONTH, month);
+      calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+      reminderDateView.setText(DateUtils.formatDateTime(getApplicationContext(),
+              calendar.getTimeInMillis(),
+              DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR));
+      reminderDate = (DateUtils.formatDateTime(getApplicationContext(),
+              calendar.getTimeInMillis(),
+              DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR));
+    };
+    new DatePickerDialog(EditTaskActivity.this, d,
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH))
+            .show();
+  }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+  public void delTimeReminder(View view) {
+    reminderTime = null;
+    reminderTimeView.setText(R.string.no_choose_reminder_time);
+  }
 
-        if (resultCode == Activity.RESULT_OK & requestCode == GALLERY_REQUEST) {
-            switch (requestCode) {
-                case GALLERY_REQUEST:
-                    Uri selectedImage = data.getData();
-                    try {
-                        InputStream inputStream = getContentResolver().openInputStream(selectedImage);
-                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                        imageView = (ImageView) findViewById(R.id.task_image);
-                        imageView.setImageBitmap(bitmap);
+  public void delCompleteDate(View view) {
+  }
 
-                        task.setImage(bitmap);
-                        inputStream.close();
-                    } catch (IOException e) {
-                        Log.i("TAG", e.toString());
-                    }
-                    break;
-            }
-        }
-    }
-
-//    public void setTime(View v) {
-//        new TimePickerDialog(this, t,
-//                dateAndTime.get(Calendar.HOUR_OF_DAY),
-//                dateAndTime.get(Calendar.MINUTE), true)
-//                .show();
-//    }
-//
-//    public void setDate(View view) {
-//        new DatePickerDialog(this, t,
-//                dateAndTime.get(Calendar.HOUR_OF_DAY),
-//                dateAndTime.get(Calendar.MINUTE), true)
-//                .show();
-//    }
-//
-//    private void setInitialDateTime() {
-//        currentDateTime.setText(DateUtils.formatDateTime(getApplicationContext(),
-//                dateAndTime.getTimeInMillis(),
-//                DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR
-//                        | DateUtils.FORMAT_SHOW_TIME));
-//    }
-//
-//    TimePickerDialog.OnTimeSetListener t = new TimePickerDialog.OnTimeSetListener() {
-//        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-//            dateAndTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
-//            dateAndTime.set(Calendar.MINUTE, minute);
-//            setInitialDateTime();
-//        }
-//    };
-//    DatePickerDialog.OnDateSetListener d = new DatePickerDialog.OnDateSetListener() {
-//        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-//            dateAndTime.set(Calendar.YEAR, year);
-//            dateAndTime.set(Calendar.MONTH, monthOfYear);
-//            dateAndTime.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-//            setInitialDateTime();
-//        }
-//    };
+  public void delDateReminder(View view) {
+    reminderDate = null;
+    reminderDateView.setText(R.string.no_choose_reminder_date);
+  }
 }

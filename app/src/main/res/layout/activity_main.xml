@@ -26,14 +26,14 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:onClick="goToTasks"
-                android:text="Tasks"/>
+                android:text="@string/tasks"/>
             <Button
                 android:id="@+id/button_planned"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:onClick="goToPlanned"
-                android:text="Planned" />
+                android:text="@string/planned" />
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
@@ -52,5 +52,5 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:src="@drawable/ic_add_new_black"
-        android:backgroundTint="@color/cardview_dark_background"/>
+        android:backgroundTint="@color/purple_500"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

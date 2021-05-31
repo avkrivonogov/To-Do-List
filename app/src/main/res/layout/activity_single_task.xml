@@ -27,36 +27,69 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/title"
+                android:textSize="20sp"
                 android:paddingStart="6dp"
                 android:paddingTop="6dp"
                 android:paddingEnd="16dp"
-                android:paddingBottom="6dp" />
+                android:paddingBottom="6dp"
+                android:textColor="@color/black"/>
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/tasks_list"
+        <LinearLayout
+            android:id="@+id/task_list_linear"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/title"/>
+            app:layout_constraintTop_toBottomOf="@+id/title"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/tasks_list" />
+            <TextView
+                android:id="@+id/tasks_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"/>
+        </LinearLayout>
+
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/task_image_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/tasks_list">
+            app:layout_constraintTop_toBottomOf="@+id/task_list_linear">
+
+            <LinearLayout
+                android:id="@+id/image_n_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="@id/task_image_description"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/image" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/comment" />
+            </LinearLayout>
 
             <ImageView
                 android:id="@+id/image"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                app:layout_constraintTop_toTopOf="@id/task_image_description"
+                app:layout_constraintTop_toBottomOf="@+id/image_n_description"
                 app:layout_constraintLeft_toLeftOf="@+id/task_image_description"/>
             <TextView
                 android:id="@+id/task_description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="@+id/task_image_description"
-                app:layout_constraintLeft_toRightOf="@+id/image"/>
+                app:layout_constraintTop_toBottomOf="@+id/image_n_description"
+                app:layout_constraintLeft_toRightOf="@+id/image"
+                android:textColor="@color/black" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
@@ -68,13 +101,18 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/creation_date" />
 
                 <TextView
                     android:id="@+id/creation_date"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="12"
                     android:freezesText="true"
                     android:gravity="center_vertical"
                     android:textColor="@color/black" />
@@ -82,13 +120,18 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/complete_date" />
 
                 <TextView
                     android:id="@+id/complete_date"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="12"
                     android:freezesText="true"
                     android:gravity="center_vertical"
                     android:textColor="@color/black" />
@@ -96,13 +139,37 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/reminder_task"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="12"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/reminder_date" />
+
+                <TextView
+                    android:id="@+id/reminder_task_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:freezesText="true"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/black" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/reminder_time" />
+
+                <TextView
+                    android:id="@+id/reminder_task_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:freezesText="true"
                     android:gravity="center_vertical"
                     android:textColor="@color/black" />
@@ -121,10 +188,21 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+                <TextView
+                    android:id="@+id/complete_step_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/step_list"/>
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/steps_list"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
             </LinearLayout>
         </ScrollView>
@@ -136,5 +214,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
+        android:backgroundTint="@color/purple_500"
         android:src="@drawable/ic_edit" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

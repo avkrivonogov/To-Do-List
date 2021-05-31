@@ -1,145 +1,152 @@
 package com.htc.avkrivonogov.mynotes.controllers.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Paint;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.htc.avkrivonogov.mynotes.R;
 import com.htc.avkrivonogov.mynotes.data.DatabaseHelper;
+import com.htc.avkrivonogov.mynotes.data.TaskMethods;
 import com.htc.avkrivonogov.mynotes.data.TaskStepsMethods;
 import com.htc.avkrivonogov.mynotes.models.Task;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.List;
 
+/**
+ * Реализация адаптера для задач.
+ */
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
 
-    public interface OnTaskClickListener {
-        void onTaskClick(Task task, int position);
+  /**
+   * Интерфейс для обработки нажатия на элемент RecyclerView.
+   */
+  public interface OnTaskClickListener {
+    void onTaskClick(Task task, int position);
+  }
+
+  private OnTaskClickListener onTaskClickListener;
+  private List<Task> tasks;
+  private LayoutInflater inflater;
+
+  DatabaseHelper databaseHelper;
+  SQLiteDatabase db;
+
+  Context context;
+
+  /**
+   * Конструктор адаптера.
+   *
+   * @param context Контекст.
+   * @param onTaskClick Описание поведения при нажатии на элемент RecyclerView.
+   * @param tasks Задачи.
+   */
+  public TaskAdapter(Context context, OnTaskClickListener onTaskClick,
+                       List<Task> tasks) {
+    this.context = context;
+    this.onTaskClickListener = onTaskClick;
+    this.inflater = LayoutInflater.from(context);
+    this.tasks = tasks;
+
+    databaseHelper  = new DatabaseHelper(context);
+    db = databaseHelper.getReadableDatabase();
+  }
+
+  @NonNull
+  @Override
+  public TaskAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    View itemView = LayoutInflater.from(parent.getContext())
+            .inflate(R.layout.tasks_list, parent, false);
+    return new TaskAdapter.ViewHolder(itemView);
+  }
+
+  @SuppressLint("SetTextI18n")
+  @Override
+  public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    Task task = tasks.get(position);
+    holder.title.setText(task.getTitle());
+    if (task.getImage() != null) {
+      Uri uri = Uri.parse(task.getImage());
+      try {
+        final InputStream imageStream = context.getContentResolver().openInputStream(uri);
+        final Bitmap selectedImages = BitmapFactory.decodeStream(imageStream);
+        holder.image.setImageBitmap(selectedImages);
+      } catch (FileNotFoundException e) {
+        e.printStackTrace();
+      }
     }
 
-    private TaskAdapter.OnTaskClickListener onTaskClickListener;
-    private List<Task> tasks;
-    private LayoutInflater inflater;
-    private boolean isSortByAsc;
+    holder.completeTask.setOnCheckedChangeListener((buttonView, isChecked) -> {
+      if (isChecked) {
+        task.setCompleteStatus(1);
+        holder.title.setPaintFlags(holder.title.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+      } else {
+        task.setCompleteStatus(0);
+        holder.title.setPaintFlags(holder.title.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
+      }
+      TaskMethods.statusCompleteTask(db, task);
+    });
 
-    DatabaseHelper databaseHelper;
-    SQLiteDatabase db;
+    int allSteps = TaskStepsMethods.getAllSteps(db, task.getId());
+    String of = context.getString(R.string.of);
+    String stepComplete = context.getString(R.string.step_complete);
+    String noSteps = context.getString(R.string.no_steps);
 
-    Context context;
-
-
-
-    public TaskAdapter(Context context, TaskAdapter.OnTaskClickListener onTaskClick,
-                       List<Task> list) {
-        this.context = context;
-        this.onTaskClickListener = onTaskClick;
-        this.inflater = LayoutInflater.from(context);
-        this.tasks = list;
+    if (allSteps != 0) {
+      holder.countSteps.setText(TaskStepsMethods.getCompleteStepsTask(db, task.getId())
+              + " " + of + " " + TaskStepsMethods.getAllSteps(db, task.getId())
+              + " " + stepComplete);
+    } else {
+      holder.countSteps.setText(noSteps);
     }
+    String completeDateNoSelected = context.getString(R.string.no_choose_complete_date);
+    holder.dateComplete.setText(task.getCompleteDate() != null
+            ? task.getCompleteDate() : completeDateNoSelected);
 
-    @NonNull
-    @Override
-    public TaskAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.tasks_list, parent, false);
-        return new TaskAdapter.ViewHolder(itemView);
+    holder.itemView.setOnClickListener(v -> onTaskClickListener.onTaskClick(task, position));
+    if (task.getCompleteStatus() == 1) {
+      holder.completeTask.setChecked(true);
     }
+  }
 
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Task task = tasks.get(position);
+  @Override
+  public int getItemCount() {
+    return tasks.size();
+  }
 
-        holder.title.setText(task.getTitle());
+  /**
+   * Описание строки RecyclerView.
+   */
+  public static class ViewHolder extends RecyclerView.ViewHolder {
+    CheckBox completeTask;
+    TextView title;
+    TextView countSteps;
+    TextView dateComplete;
+    ImageView image;
 
-        holder.completeTask.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if(isChecked) {
-                task.setCompleteStatus(1);
-            } else {
-                task.setCompleteStatus(0);
-            }
-        });
-
-        holder.itemView.setOnClickListener(v -> onTaskClickListener.onTaskClick(task, position));
-        if (task.getCompleteStatus() == 1) {
-            holder.completeTask.setChecked(true);
-            holder.title.setPaintFlags(holder.title.getPaintFlags() |
-                    Paint.STRIKE_THRU_TEXT_FLAG);
-        } else {
-            holder.title.setPaintFlags(holder.title.getPaintFlags() &
-                    (~ Paint.STRIKE_THRU_TEXT_FLAG));
-        }
-
-        int allSteps = TaskStepsMethods.getAllSteps(db, task.getId());
-        if (allSteps != 0) {
-            holder.countSteps.setText(TaskStepsMethods.getCompleteStepsTask(db, task.getId())
-            + R.string.of + allSteps);
-        }
-
-        LocalDate completeDate = task.getCompleteDate();
-        holder.dateComplete.setText(completeDate != null
-                ? completeDate.format(DateTimeFormatter.ofPattern("dd MM yyyy"))
-                : null);
-
-        Bitmap image = task.getImage();
-        holder.image.setImageBitmap(image);
-        holder.image.setVisibility(image != null ? View.VISIBLE : View.GONE);
+    /**
+     * Конструктор описания строки.
+     *
+     * @param itemView для описания строки RecyclerView.
+     */
+    public ViewHolder(@NonNull View itemView) {
+      super(itemView);
+      completeTask = itemView.findViewById(R.id.complete_task);
+      title = itemView.findViewById(R.id.task_title_in_list);
+      countSteps = itemView.findViewById(R.id.count_steps);
+      dateComplete = itemView.findViewById(R.id.date_complete);
+      image = itemView.findViewById(R.id.image_task_in_list);
     }
-
-
-    @Override
-    public int getItemCount() {
-        return tasks.size();
-    }
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        CheckBox completeTask;
-        TextView title;
-        TextView countSteps;
-        TextView dateComplete;
-        ImageView image;
-
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            completeTask = itemView.findViewById(R.id.complete_task);
-            title = itemView.findViewById(R.id.task_title_in_list);
-            countSteps = itemView.findViewById(R.id.count_steps);
-            dateComplete = itemView.findViewById(R.id.date_complete);
-            image = itemView.findViewById(R.id.image_task_in_list);
-        }
-    }
-
-    public void sortTaskByCreation() {
-        if (isSortByAsc) {
-            tasks.sort(((o1, o2) -> o2.getCreation().compareTo(o1.getCreation())));
-            isSortByAsc = false;
-        } else {
-            tasks.sort(((o1, o2) -> o1.getCreation().compareTo(o2.getCreation())));
-            isSortByAsc = true;
-        }
-        notifyDataSetChanged();
-    }
-
-    public void sortTaskByComplete() {
-        if (isSortByAsc) {
-            tasks.sort(((o1, o2) -> o2.getCompleteDate().compareTo(o1.getCompleteDate())));
-            isSortByAsc = false;
-        } else {
-            tasks.sort(((o1, o2) -> o1.getCompleteDate().compareTo(o2.getCompleteDate())));
-            isSortByAsc = true;
-        }
-        notifyDataSetChanged();
-    }
+  }
 }

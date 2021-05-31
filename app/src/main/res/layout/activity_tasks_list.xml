@@ -34,7 +34,8 @@
             android:id="@+id/rv_tasks_list"
             app:layout_constraintTop_toBottomOf="@+id/title"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -44,7 +45,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:onClick="saveTask"
-        android:src="@drawable/ic_add_new_black"
-        />
+        android:backgroundTint="@color/purple_500"
+        android:src="@drawable/ic_add_new_black" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

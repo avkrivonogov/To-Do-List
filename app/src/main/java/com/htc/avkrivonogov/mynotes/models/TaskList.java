@@ -1,9 +1,22 @@
 package com.htc.avkrivonogov.mynotes.models;
 
-public class TaskList {
+import java.util.Comparator;
+import java.util.List;
+
+/**
+ * Модель списка задач.
+ */
+public class TaskList implements Comparable<TaskList> {
+
   private int id;
   private String title;
 
+  /**
+   * Конструктор списка задач.
+   *
+   * @param id списка.
+   * @param title Заголовок списка.
+   */
   public TaskList(int id, String title) {
     this.id = id;
     this.title = title;
@@ -21,9 +34,8 @@ public class TaskList {
     this.title = title;
   }
 
-// ПОдумать надо ли
-//  @Override
-//  public int compareTo(TaskList o) {
-//    return title.compareTo(o.getTitle());
-//  }
+  @Override
+  public int compareTo(TaskList o) {
+    return title.compareTo(o.getTitle());
+  }
 }

@@ -1,4 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">MyNotes</string>
+    <string name="title">Title</string>
+    <string name="sort">Sort</string>
+    <string name="delete">Delete</string>
+    <string name="alarm">Alarm</string>
+    <string name="edit_task">Edit</string>
+    <string name="edit">Edit</string>
+    <string name="planned">Planned</string>
+    <string name="tasks">Tasks</string>
+    <string name="new_task_list">New Task List</string>
+    <string name="new_task">New Task</string>
     <string name="enter_new_name">Enter New Name</string>
+    <string name="rename">Rename</string>
+    <string name="cancel">Cancel</string>
+    <string name="add_new_list">Add New List</string>
+    <string name="create_new_list">Create new List</string>
+    <string name="create">Create</string>
+    <string name="rename_list">Rename List</string>
+    <string name="save">Save</string>
+    <string name="of">Of</string>
+    <string name="add_image">Add Image</string>
+    <string name="comment">Comment</string>
+    <string name="reminder_date">Reminder</string>
+    <string name="complete_date">Complete Date</string>
+    <string name="creation_date">Creation Date</string>
+    <string name="reminder_time_error">Incorrect Time Reminder</string>
+    <string name="reminder_date_error">Incorrect Date Reminder</string>
+    <string name="end_date_error">Incorrect Date Complete</string>
+    <string name="task_title_empty">Choose Task List</string>
+    <string name="select_end_date">Select Complete Date</string>
+    <string name="step_name">Step Name</string>
+    <string name="add_new_step">Add New Step</string>
+    <string name="no_choose">No choose</string>
+    <string name="select_reminder_date">Select Reminder</string>
+    <string name="main_screen">Main Screen</string>
+    <string name="tasks_list">Tasks List</string>
+    <string name="step_list">Steps List</string>
+    <string name="image">Image</string>
+    <string name="step_complete">Steps Complete</string>
 </resources>
