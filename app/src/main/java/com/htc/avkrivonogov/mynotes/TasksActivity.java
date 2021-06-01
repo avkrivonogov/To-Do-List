@@ -33,8 +33,6 @@ public class TasksActivity extends AppCompatActivity {
   TaskAdapter taskAdapter;
   TaskAdapter.OnTaskClickListener taskClickListener;
   RecyclerView recyclerView;
-
-  SortCreationDate sortCreationDate;
   Toolbar toolbar;
 
 
@@ -49,7 +47,6 @@ public class TasksActivity extends AppCompatActivity {
     recyclerView = findViewById(R.id.rv_tasks);
     taskClickListener = (task, position) -> {
       Intent intent = new Intent(getApplicationContext(), SingleTaskActivity.class);
-//      Collections.sort(tasksList);
       intent.putExtra("id", task.getId());
       intent.putExtra("previouslyActivity", "TasksActivity");
       startActivity(intent);
@@ -88,7 +85,7 @@ public class TasksActivity extends AppCompatActivity {
         tasksList.add(task);
       }
     }
-//    Collections.sort(tasksList, sortCreationDate);
+    Collections.sort(tasksList, new SortCreationDate());
     taskAdapter = new TaskAdapter(this, taskClickListener, tasksList);
     recyclerView.setAdapter(taskAdapter);
 

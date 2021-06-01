@@ -49,4 +49,5 @@
     <string name="no_choose_reminder_date">Reminder Date No Choose</string>
     <string name="no_choose_reminder_time">Reminder Time No Choose</string>
     <string name="list_no_choose">Tasks List No Choose</string>
+    <string name="no_comments_yet">No Comments Yet</string>
 </resources>

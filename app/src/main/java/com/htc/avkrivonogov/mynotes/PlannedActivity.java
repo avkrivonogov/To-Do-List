@@ -18,7 +18,6 @@ import com.htc.avkrivonogov.mynotes.data.TaskMethods;
 import com.htc.avkrivonogov.mynotes.models.Task;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -35,7 +34,6 @@ public class PlannedActivity extends AppCompatActivity {
   RecyclerView recyclerView;
   TaskAdapter taskAdapter;
   TaskAdapter.OnTaskClickListener taskClickListener;
-  SortCompleteDate sortCompleteDate;
 
   Toolbar toolbar;
 
@@ -79,16 +77,16 @@ public class PlannedActivity extends AppCompatActivity {
               title,
               description,
               image,
+              creation,
               completeDate,
               reminderDate,
               reminderTime,
-              creation,
               listTaskId,
               complete, completeStep);
       if (completeDate != null) {
         tasksList.add(task);
       }
-      tasksList.sort(sortCompleteDate);
+      Collections.sort(tasksList, new SortCompleteDate());
       taskAdapter = new TaskAdapter(this, taskClickListener, tasksList);
       recyclerView.setAdapter(taskAdapter);
     }

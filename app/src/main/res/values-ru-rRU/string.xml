@@ -50,4 +50,5 @@
     <string name="reminder_time">Время Напоминания</string>
     <string name="no_choose_reminder_date">Дата Напоминания Не Выбрана</string>
     <string name="no_choose_reminder_time">Время Напоминания Не Выбрано</string>
+    <string name="no_comments_yet">Нет комментариев</string>
 </resources>

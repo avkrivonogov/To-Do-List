@@ -167,7 +167,13 @@ public class SingleTaskActivity extends AppCompatActivity {
     } else {
       titleView.setPaintFlags(titleView.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
     }
-    descriptionView.setText(description);
+
+    String noComment = getString(R.string.no_comments_yet);
+    if (description != null) {
+      descriptionView.setText(description);
+    } else {
+      descriptionView.setText(noComment);
+    }
 
     String of = getString(R.string.of);
     String stepComplete = getString(R.string.step_complete);
