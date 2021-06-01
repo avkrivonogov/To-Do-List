@@ -166,18 +166,6 @@ public class Task {
     this.completeStep = completeStep;
   }
 
-  public Date getDateFromString() {
-    Date date = null;
-    DateFormat format = new SimpleDateFormat("dd.MM.yyyy");
-    String strDate = getCompleteDate();
-    try {
-      date = format.parse(strDate);
-    } catch (ParseException e) {
-      e.printStackTrace();
-    }
-    return date;
-  }
-
 //  @Override
 //  public int compareTo(Task o) {
 //    return creationDate.compareTo(o.getCreationDate());

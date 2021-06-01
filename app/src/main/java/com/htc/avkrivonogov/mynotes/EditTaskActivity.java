@@ -235,11 +235,6 @@ public class EditTaskActivity extends AppCompatActivity {
         TaskStepsMethods.insert(db, id, stepList);
       }
 
-      Intent intent = new Intent();
-      intent.putExtra("id", id);
-      setResult(REFRESH_TASK, intent);
-      finish();
-
       if (reminderDate != null && reminderTime != null) {
         Date date = null;
         DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss dd.MM.yyyy");
@@ -251,7 +246,7 @@ public class EditTaskActivity extends AppCompatActivity {
         }
 
         Intent reminderIntent = new Intent(getApplicationContext(), AlarmReceiver.class);
-        reminderIntent.putExtra("taskId", id);
+        reminderIntent.putExtra("id", id);
         reminderIntent.putExtra("title", task.getTitle());
         if (task.getDescription() != null) {
           reminderIntent.putExtra("description", task.getDescription());
@@ -264,6 +259,11 @@ public class EditTaskActivity extends AppCompatActivity {
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         alarmManager.set(AlarmManager.RTC, date.getTime(), pendingIntent);
       }
+
+      Intent intent = new Intent();
+      intent.putExtra("id", id);
+      setResult(REFRESH_TASK, intent);
+      finish();
     }
   }
 

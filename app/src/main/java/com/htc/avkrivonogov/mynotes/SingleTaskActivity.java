@@ -103,7 +103,7 @@ public class SingleTaskActivity extends AppCompatActivity {
               cursor.getString(cursor.getColumnIndex(DatabaseHelper.KEY_TASK_REMINDER_TIME));
       listTaskId = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.CATEGORY_ID));
       completeStatus =
-              cursor.getInt(cursor.getColumnIndex(DatabaseHelper.KEY_TASK_CREATION));
+              cursor.getInt(cursor.getColumnIndex(DatabaseHelper.KEY_TASK_STATUS));
     }
 
     toolbar = findViewById(R.id.edit_toolbar);
@@ -164,6 +164,8 @@ public class SingleTaskActivity extends AppCompatActivity {
     }
     if (completeStatus == 1) {
       titleView.setPaintFlags(titleView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+    } else {
+      titleView.setPaintFlags(titleView.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
     }
     descriptionView.setText(description);
 
