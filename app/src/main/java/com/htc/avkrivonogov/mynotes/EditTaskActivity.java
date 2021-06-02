@@ -344,7 +344,6 @@ public class EditTaskActivity extends AppCompatActivity {
   }
 
   public void delTimeReminder(View view) {
-    reminderTime = null;
     reminderTimeView.setText(R.string.no_choose_reminder_time);
   }
 
@@ -352,7 +351,6 @@ public class EditTaskActivity extends AppCompatActivity {
   }
 
   public void delDateReminder(View view) {
-    reminderDate = null;
     reminderDateView.setText(R.string.no_choose_reminder_date);
   }
 }
